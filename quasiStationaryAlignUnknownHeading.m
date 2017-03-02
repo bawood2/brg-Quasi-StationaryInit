@@ -24,9 +24,9 @@ state.dx = state.dx + K*dz;
 state.dr = state.dr - state.dx(1:3);
 state.v = state.v - state.dx(4:6);
 state.t = state.t - state.dx(7:9);
-state.T = R_XYZ(state.dx(7),state.dx(8),state.dx(9))'*state.T; % Errors may not yet be <2deg
-state.state.sinSi = state.state.sinSi - state.dx(10);
-state.state.cosSi = state.state.cosSi - state.dx(11);
+state.T = T_ZYX_Unknown(state.dx(10),state.dx(11),state.dx(8),state.dx(9))'*state.T; % Errors may not yet be <2deg
+state.sinSi = state.sinSi - state.dx(10);
+state.cosSi = state.cosSi - state.dx(11);
 state.b_a = state.b_a - state.dx(12:14);
 state.b_g = state.b_g - state.dx(15:17);
 
@@ -34,7 +34,17 @@ state.b_g = state.b_g - state.dx(15:17);
 state.dx(1:9) = zeros(9,1);
 
 
+end
 
+function T = T_ZYX_Unknown(sinSi,cosSi,theta,phi)
+% Define a Rotation Matrix for ZYX Euler sequence
+cosTheta = cos(theta);
+sinTheta = sin(theta);
+cosPhi = cos(phi);
+sinPhi = sin(phi);
+Rz = [ cosSi -sinSi 0 ; sinSi cosSi 0 ; 0 0 1];  %yaw
+Ry = [ cosTheta 0 sinTheta ; 0 1 0 ; -sinTheta 0 cosTheta]; %pitch
+Rx = [ 1 0 0 ; 0 cosPhi -sinPhi ; 0 sinPhi cosPhi]; %roll
 
-
+T = Rz*Ry*Rx;   % - compute orientation from Euler Angles (state.theta1, state.theta2, state.theta3)
 end
