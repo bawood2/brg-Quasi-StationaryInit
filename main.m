@@ -1,9 +1,5 @@
 %quasiStationaryAlignUnknownHeading test script
 
-%2/18/17 Notes
-% Check coordinate transformation initialization. May need to do a
-% transpose
-
 % Initialize Data.  These should all be inputs
 specificForce = 1; % Load IMU specific force measurements
 angularRate = 1; % Load IMU angular rate measurements
@@ -72,7 +68,23 @@ for i = 1:length(specificForce);
         imu.dt = dt(i);
         state = quasiStationaryAlignUnknownHeading(state,params,imu);            
     end
-        
+    
+    %Once wander azimuth solution <2deg...
+    %Make consistant with (cosSi)^2 + (sinSi)^2 = 1
+    cosSi  =  state.cosSi;
+    sinSi = 1 - cosSi^2;
+    cosSi = 1 - sinSi^2;
+    %Compute transformation from local navigation to body
+    Rnw = [ cosSi, -sinSi, 0.0; sinSi, cosSi, 0.0; 0.0, 0.0, 1.0];
+    Tnb = Rnw*state.T;
+    Tnb = reOrthoNorm(Tnb);
+    state.T = Tnb;
+    %Tranform resolving frame from wander to local navigation
+    state.r = Rnw*state.r;
+    state.v = Rnw*state.v;
+    state.t = getEulerZYX(state.T);  %get new attitude
+
+    
 end
 
 for i = 1:length(specificForce);
