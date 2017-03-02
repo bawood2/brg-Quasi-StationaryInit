@@ -1,12 +1,14 @@
 %quasiStationaryAlignUnknownHeading test script
+DEG_TO_RAD = pi/180.0;
 
 % Initialize Data.  These should all be inputs
 specificForce = 1; % Load IMU specific force measurements
 angularRate = 1; % Load IMU angular rate measurements
 dt = 1;
-L = 1;
-lambda = 1;
-h = 1;
+%Lat Long coordinates are for UIUC
+L = 88.2272*DEG_TO_RAD; % longitude  88.2272° W  
+lambda = 40.1020*DEG_TO_RAD; %latitude  40.1020° N
+h = 225; %altitude  %	225 m elevation of champaign IL
 
 %In system, IMU measurements are being taken.  Prior to alignment, need to
 %initialize orientation.  This is done by a leveling process. Prior to
