@@ -7,11 +7,18 @@ function R = R_ZYX(t1,t2,t3)
 %
 %Ouputs
 %   R : ZYX (yaw,pitch,roll) Euler Sequence coordinate transformation
+cosSi = cos(t1);
+sinSi = sin(t1);
+cosTheta = cos(t2);
+sinTheta = sin(t2);
+cosPhi = cos(t3);
+sinPhi = sin(t3);
+
 
 % Define a Rotation Matrix for ZYX Euler sequence
-Rz = [ cos(t1) -sin(t1) 0 ; sin(t1) cos(t1) 0 ; 0 0 1];
-Ry = [ cos(t2) 0 sin(t2) ; 0 1 0 ; -sin(t2) 0 cos(t2)];
-Rx = [ 1 0 0 ; 0 cos(t3) -sin(t3) ; 0 sin(t3) cos(t3)];
+Rz = [ cosSi -sinSi 0 ; sinSi cosSi 0 ; 0 0 1];
+Ry = [ cosTheta 0 sinTheta ; 0 1 0 ; -sinTheta 0 cosTheta];
+Rx = [ 1 0 0 ; 0 cosPhi -sinPhi ; 0 sinPhi cosPhi];
 
 R = Rz*Ry*Rx;   % - compute orientation from Euler Angles (state.theta1, state.theta2, state.theta3)
 
