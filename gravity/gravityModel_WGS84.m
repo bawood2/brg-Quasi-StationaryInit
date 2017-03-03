@@ -19,7 +19,7 @@ f = 1 / 298.257223563; % Earths flattening
 e = 0.0818191908425; % Earths eccentricity
 
 %WGS 84 Earth physical characteristics
-omega = 7.292115 * 10 ^ -5; % Earths angular rate [rad/s]
+omegaIE = 7.292115 * 10 ^ -5; % Earths angular rate [rad/s]
 mu = 3.986004418*10^14; % Earths gravitational constant [m^3 / s^2]
 
 
@@ -30,7 +30,7 @@ beta = 0.001931853;
 sinL2 = sin(L)^2;
 g0 = alpha * (1.0 + beta*sinL2) / sqrt( 1.0 - e^2*sinL2 ) ;
 
-g = g0 * ( 1.0 - 2.0 / R0 * ( 1.0 + f + omega^2*R0^2*RP/mu )*h + 3.0 / R0^2 * h^2 );
+g = g0 * ( 1.0 - 2.0 / R0 * ( 1.0 + f + omegaIE^2*R0^2*RP/mu )*h + 3.0 / R0^2 * h^2 );
 
 
 %Record parameters
@@ -41,5 +41,5 @@ params.f = f; % Earths flattening
 params.e = e; % Earths eccentricity
 
 %WGS 84 Earth physical characteristics
-params.omegaE= omega; % Earths angular rate [rad/s]
+params.omegaIE= omegaIE; % Earths angular rate [rad/s]
 params.mu = mu; % Earths gravitational constant [m^3 / s^2]
