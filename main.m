@@ -19,8 +19,10 @@ angularRate = gyroData(:,2:4)'; % Load IMU angular rate measurements
 % the recorded times between the measurements do not align.  
 
 aTime = accelData(:,1)/1000.0; %Unix time [s] of accel measurements
+dta = aTime(2:end) - aTime(1:(end-1));
 gTime = gyroData(:,1)/1000.0;
-dt = (mean(aTime) + mean(gTime))/2.0;  %take average time for now.  
+dtg = gTime(2:end) - gTime(1:(end-1));
+dt = (mean(dta) + mean(dtg))/2.0;  %take average time for now.  
 
 %Get the number of measurements
 na = length(aTime);
