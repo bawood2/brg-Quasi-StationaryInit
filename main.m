@@ -11,8 +11,8 @@ gyroData = xlsread(gyroFID);
 magData = xlsread(magFID);
 
 % Initialize Data.  These should all be inputs
-specificForce = accelData(:,2:4); % Load IMU specific force measurements
-angularRate = gyroData(:,2:4); % Load IMU angular rate measurements
+specificForce = accelData(:,2:4)'; % Load IMU specific force measurements
+angularRate = gyroData(:,2:4)'; % Load IMU angular rate measurements
 
 %Get the average rate of each measurement
 % 3/3/17 : May need to change this to searching for specific times since
@@ -40,15 +40,15 @@ h = 225; %altitude  %	225 m elevation of champaign IL
 
 counter = 1;
 countermax = 20;
-fbar = 0;
+fbar = [0;0;0];
 
-for i = 1:length(nMeasurements);
+for i = 1:nMeasurements;
     
     
     
     %Leveling Process
     if i <countermax
-        fbar = fbar + specificforce(i);       
+        fbar = fbar + specificForce(:,i);       
     elseif i == countermax %Initialize
         
         fbar = fbar/countermax;
@@ -79,8 +79,7 @@ for i = 1:length(nMeasurements);
         state.dx = zeros(state.n,1);
 
         %Initialize Parameters
-        params.g = gravityModel_WGS84(L,h); %gravity model
-        params.omegaE = 7.292115 * 10 ^ -5; % WGS 84 Earths angular rate [rad/s]
+        params = gravityModel_WGS84(L,h); %gravity model
         params.cosL = cos(L);
         params.sinL = sin(L);
         params.Q = getQ_QuasiStationaryUnknown(state);
@@ -89,13 +88,17 @@ for i = 1:length(nMeasurements);
         
 
     else
-        imu.f = specificForce(i);
-        imu.omega = angularRate(i);
-        imu.dt = dt(i);
+        imu.f = specificForce(:,i);
+        imu.omega = angularRate(:,i);
+        imu.dt = dt ; %dt(i);
         state = quasiStationaryAlignUnknownHeading(state,params,imu);            
     end
     
-    %Once wander azimuth solution <2deg...
+    
+    
+end
+
+%Once wander azimuth solution <2deg...
     %Make consistant with (cosSi)^2 + (sinSi)^2 = 1
     cosSi  =  state.cosSi;
     sinSi = 1 - cosSi^2;
@@ -110,8 +113,7 @@ for i = 1:length(nMeasurements);
     state.v = Rnw*state.v;
     state.t = getEulerZYX(state.T);  %get new attitude
 
-    
-end
+
 
 for i = 1:length(specificForce);
     
