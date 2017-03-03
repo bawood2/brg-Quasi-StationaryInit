@@ -15,7 +15,7 @@ M = [ 0 , params.sinL , -state.sinSi* params.cosL;...
     state.sinSi* params.cosL, state.cosSi* params.cosL, 0];
 
 OmegaIB = skewmat(omegaIB); 
-Tk = Tkm1*(eye(3) + OmegaIB) - params.omegaE*dt*M*Tkm1; % eq13.12  
+Tk = Tkm1*(eye(3) + OmegaIB) - params.omegaIE*dt*M*Tkm1; % eq13.12  
 %2/26/17 : may be an error with this equation.  Omega may need to be Omega*dt
 state.T = reOrthoNorm(Tk);
 
