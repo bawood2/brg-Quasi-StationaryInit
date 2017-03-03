@@ -1,7 +1,7 @@
 function state = imuStatePropogationUnknown(state,params,imu)
 
 %Initial values
-dt = state.dt; %Timestep
+dt = imu.dt; %Timestep
 
 vkm1 = state.v; % velocity
 Tkm1 = state.T; % Coordiante Fram Tranformation
