@@ -18,15 +18,15 @@ dvdot_dsi = -skewmat(T*f);
 dvdot_dx = [ O O dvdot_dsi o o T O];
 
 %Compute attitude Jacobian
-dsidot_dsi = -skewmat(omega);
-dsidot_dsin = [ 0 ;wie*params.cosL ; 0 ];
-dsidot_dcos = [ -wie*params.cosL; 0 ; 0];
+dsidot_dsi = -skewmat(wie);
+dsidot_dsin = [ 0 ;params.omegaIE*params.cosL ; 0 ];
+dsidot_dcos = [ -params.omegaIE*params.cosL; 0 ; 0];
 
 dsidot_dx = [ O O dsidot_dsi dsidot_dsin dsidot_dcos O T];
 
 %Compute wander aziumuth angle Jacobains
-dsin_dx = zeros(state.n,1);
-dcos_dx = zeros(state.n,1);
+dsin_dx = zeros(1,state.n);
+dcos_dx = zeros(1,state.n);
 
 %Compute accelerometer bias Jacobain
 dba_dx = [O O O o o O O];
