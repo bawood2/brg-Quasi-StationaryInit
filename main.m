@@ -1,14 +1,38 @@
 %quasiStationaryAlignUnknownHeading test script
 DEG_TO_RAD = pi/180.0;
 
+
+%Load data
+accelFID = 'quasi-stationary_accel.xlsx';
+gyroFID = 'quasi-stationary_gryo.xlsx';
+magFID = 'quasi-stationary_mag.xlsx';
+accelData = xlsread(accelFID);
+gyroData = xlsread(gyroFID);
+magData = xlsread(magFID);
+
 % Initialize Data.  These should all be inputs
-specificForce = 1; % Load IMU specific force measurements
-angularRate = 1; % Load IMU angular rate measurements
-dt = 1;
+specificForce = accelData(:,2:4); % Load IMU specific force measurements
+angularRate = gyroData(:,2:4); % Load IMU angular rate measurements
+
+%Get the average rate of each measurement
+% 3/3/17 : May need to change this to searching for specific times since
+% the recorded times between the measurements do not align.  
+
+aTime = accelData(:,1)/1000.0; %Unix time [s] of accel measurements
+gTime = gyroData(:,1)/1000.0;
+dt = (mean(aTime) + mean(gTime))/2.0;  %take average time for now.  
+
+%Get the number of measurements
+na = length(aTime);
+ng = length(gTime);
+nMeasurements = (na<ng)*na + (ng<na)*ng; 
+
 %Lat Long coordinates are for UIUC
 L = 88.2272*DEG_TO_RAD; % longitude  88.2272° W  
 lambda = 40.1020*DEG_TO_RAD; %latitude  40.1020° N
 h = 225; %altitude  %	225 m elevation of champaign IL
+
+
 
 %In system, IMU measurements are being taken.  Prior to alignment, need to
 %initialize orientation.  This is done by a leveling process. Prior to
@@ -18,7 +42,7 @@ counter = 1;
 countermax = 20;
 fbar = 0;
 
-for i = 1:length(specificForce);
+for i = 1:length(nMeasurements);
     
     
     
