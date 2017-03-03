@@ -7,7 +7,7 @@ I = eye(3);
 T = state.T; % Coordinate transformation matrix
 f = imu.f - state.b_a; % specific force
 
-wie = params.omegaE* [ state.cosSi * params.cosL ; -state.sinSi*params.cosL ; params.sinL ] ;
+wie = params.omegaIE* [ state.cosSi * params.cosL ; -state.sinSi*params.cosL ; params.sinL ] ;
 
 %Compute position Jocobian
 drdot_dx = [ O I O o o O O];
