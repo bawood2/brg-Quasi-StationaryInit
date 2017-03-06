@@ -1,5 +1,18 @@
 function F = getF_QuasiStationaryUnknown(state,params,imu)
-
+%getF_QuasiStationaryUnknown : get measurement and measurement mapping
+%matix for the Quasi-stationary unknown heading implementation
+%Inputs
+%   state : data structure containing elements of the state
+%   params : data structure containing additional parameters
+%   imu: data structure containing imu data
+%Outputs
+%   F : system transition matrix.  Jocobian  d xdot / d x
+%
+%Reference
+%   Equations from Chapter 13 : INS Alignment pg 414
+%
+%Log 
+% 3/5/17 Brandon Wood : Initial Implementation
 O = zeros(3,3);
 o = zeros(3,1);
 I = eye(3);
