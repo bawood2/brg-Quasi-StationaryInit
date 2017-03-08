@@ -8,7 +8,7 @@ sigma_cosSi = 1; % initial guess
 sigma_ba = [0.1,0.1,0.1]; % initial guess
 sigma_bg = [0.1,0.1,0.1]; % initial guess
 
-P = diag( [ sigma_r^2,sigma_v^2,sigma_t^2,sigma_sinSi^2,sigma_cosSi^2,sigma_ba^2,sigma_bg^2]);
+P = diag( [ sigma_r.^2,sigma_v.^2,sigma_t.^2,sigma_sinSi.^2,sigma_cosSi.^2,sigma_ba.^2,sigma_bg.^2]);
 
 
 
