@@ -1,6 +1,6 @@
 function F = getF_QuasiStationaryUnknown(state,params,imu)
-%getF_QuasiStationaryUnknown : get measurement and measurement mapping
-%matix for the Quasi-stationary unknown heading implementation
+%getF_QuasiStationaryUnknown : get system transition matrix for the
+%Quasi-stationary unknown heading implementation
 %Inputs
 %   state : data structure containing elements of the state
 %   params : data structure containing additional parameters
