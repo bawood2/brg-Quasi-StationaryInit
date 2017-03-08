@@ -32,7 +32,12 @@ countermax = 500;
 fbar = [0;0;0];
 wbar = [0;0;0];
 
-for i = 1:lenTime;
+%create burn in/out index due to exclude errors at begin and end of data
+burnIn = 1000;  %corresponds to 5 seconds
+burnOut = 1000; %corresponds to 5 seconds 
+countermax = countermax+ burnIn;
+
+for i = burnIn:(lenTime-burnOut);
     
     
     %Leveling Process
