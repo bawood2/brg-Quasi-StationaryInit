@@ -8,7 +8,7 @@ function si = gyrocompassingProcess(w,theta,phi)
 %Outputs
 %   si : heading azimuth (yaw) of body frame wrt to local navigation frame
 %
-%Notes
+%Reference
 %   Equations from Chapter 5 : Inertial Navigation pg 149
 
 cosPhi = cos(phi);
