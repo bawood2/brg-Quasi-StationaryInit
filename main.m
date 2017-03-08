@@ -10,50 +10,44 @@ accelData = xlsread(accelFID);
 gyroData = xlsread(gyroFID);
 magData = xlsread(magFID);
 
-% Initialize Data.  These should all be inputs
-specificForce = accelData(:,2:4)'; % Load IMU specific force measurements
-angularRate = gyroData(:,2:4)'; % Load IMU angular rate measurements
-
-%Get the average rate of each measurement
-% 3/3/17 : May need to change this to searching for specific times since
-% the recorded times between the measurements do not align.  
-
-aTime = accelData(:,1)/1000.0; %Unix time [s] of accel measurements
-dta = aTime(2:end) - aTime(1:(end-1));
-gTime = gyroData(:,1)/1000.0;
-dtg = gTime(2:end) - gTime(1:(end-1));
-dt = (mean(dta) + mean(dtg))/2.0;  %take average time for now.  
-
-%Get the number of measurements
-na = length(aTime);
-ng = length(gTime);
-nMeasurements = (na<ng)*na + (ng<na)*ng; 
+%Create System Time
+systemTime = getSystemTime(accelData,gyroData);
+lenTime = length(systemTime);
 
 %Lat Long coordinates are for UIUC
-L = 88.2272*DEG_TO_RAD; % longitude  88.2272° W  
+L = -88.2272*DEG_TO_RAD; % longitude  88.2272° W  
 lambda = 40.1020*DEG_TO_RAD; %latitude  40.1020° N
-h = 225; %altitude  %	225 m elevation of champaign IL
+h = 222; %altitude  %	222 m elevation of UIUC 
 
-
+%lat / long champaign
+%40.116421  
+%-88.243385
 
 %In system, IMU measurements are being taken.  Prior to alignment, need to
 %initialize orientation.  This is done by a leveling process. Prior to
 %this, a time average of IMU is taken.
 
 counter = 1;
-countermax = 20;
+countermax = 500;
 fbar = [0;0;0];
+wbar = [0;0;0];
 
-for i = 1:nMeasurements;
-    
+for i = 1:lenTime;
     
     
     %Leveling Process
     if i <countermax
-        fbar = fbar + specificForce(:,i);       
+        tk = systemTime(i);
+        ak = find_closest_index(accelData(:,1),tk);
+        gk = find_closest_index(gyroData(:,1),tk);
+        f = accelData(ak,2:4)';
+        w = gyroData(gk,2:4)';
+        fbar = fbar + f;
+        wbar = wbar + w;
     elseif i == countermax %Initialize
         
         fbar = fbar/countermax;
+        wbar = wbar/countermax;
         
         %Number of states
         state.n = 17;
@@ -65,20 +59,27 @@ for i = 1:nMeasurements;
         state.v = [0;0;0];
         %Initialize Orientation
         [theta,phi] = levelingProcess(fbar); % pitch,roll angles
-        si = 0; % initial wander azimuth
-        Twb = R_ZYX(si,theta,phi); %Initial orientation coordinate transformation %check this
+        si = gyrocompassingProcess(wbar,theta,phi); % initial wander azimuth
+        %Tnb = R_ZYX(0,theta,phi); %Initial orientation coordinate transformation %check this
         
-        state.t = [si,theta,phi];
-        state.T = Twb;
+        
+        state.t = [si;theta;phi];
+        
         state.sinSi = sin(si);
         state.cosSi = cos(si);
-               
+        %Twn = [state.cosSi, state.sinSi, 0.0; -state.sinSi, state.cosSi, 0.0; 0.0,0.0,1.0];
+        Twb = R_ZYX(si,theta,phi); %Initial orientation coordinate transformation %check this
+        %state.T = Twn*Tnb;
+        state.T = Twb; 
+        
+        
         %Initialize Bias
         state.b_a = [0.0;0.0;0.0];
         state.b_g = [0.0;0.0;0.0];
         
         %Initialize errors
         state.dx = zeros(state.n,1);
+        state.P = getP0_QuasiStationaryUnknown();
 
         %Initialize Parameters
         params = gravityModel_WGS84(L,h); %gravity model
@@ -87,13 +88,21 @@ for i = 1:nMeasurements;
         params.Q = getQ_QuasiStationaryUnknown(state);
         params.R = getR_QuasiStationaryUnknown();
         
+        %For debugging
+        params.loopCount = 0;
+        
         
 
     else
-        imu.f = specificForce(:,i);
-        imu.omega = angularRate(:,i);
+        tk = systemTime(i);
+        ak = find_closest_index(accelData(:,1),tk);
+        gk = find_closest_index(gyroData(:,1),tk);    
+        imu.f = accelData(ak,2:4)';
+        imu.omega = gyroData(gk,2:4)';
         imu.dt = dt ; %dt(i);
-        state = quasiStationaryAlignUnknownHeading(state,params,imu);            
+        state = quasiStationaryAlignUnknownHeading(state,params,imu);  
+        
+        params.loopCount = params.loopCount+1;
     end
     
     
