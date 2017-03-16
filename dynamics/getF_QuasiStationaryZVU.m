@@ -138,7 +138,7 @@ RN = params.R0 * ( 1.0 - params.e^2) / (( 1.0 - params.e^2 * sinL^2)^(3.0/2.0));
 
 end
 
-function RE = get_RE(sinL,params
+function RE = get_RE(sinL,params)
 % get_RE : Computes the Earth transverse radius of curvature
 % Reference : Groves Chapter 2 pg 41
 RE = params.R0 / (( 1.0 - params.e^2 * sinL^2)^(1.0/2.0));

@@ -15,6 +15,7 @@ function Q = getQ_MotorolaMotoZPlayUnknown(state)
 %Log 
 % 3/16/17 Brandon Wood : Initial Implementation
 
+o = zeros(3,1);
 O = zeros(3,3);
 
 %Approximate values from 

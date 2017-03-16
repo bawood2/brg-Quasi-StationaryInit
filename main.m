@@ -33,6 +33,11 @@ burnIn = 1000;  %corresponds to 5 seconds
 burnOut = 1000; %corresponds to 5 seconds 
 countermax = countermax+ burnIn;
 
+%Initialize Data Structures
+state = [];
+imu = [];
+params = [];
+
 for i = burnIn:(lenTime-burnOut);
     
     
@@ -87,7 +92,7 @@ for i = burnIn:(lenTime-burnOut);
         state.P = getP0_QuasiStationaryUnknown();
 
         %Initialize Parameters
-        params = gravityModel_WGS84(L,h); %gravity model
+        params = gravityModel_WGS84(L,h,params); %gravity model
         params.cosL = cos(L);
         params.sinL = sin(L);
         params.Q = getQ_MotorolaMotoZPlayUnknown(state);
@@ -115,46 +120,66 @@ for i = burnIn:(lenTime-burnOut);
     
 end
 
-%Once wander azimuth solution <2deg...
-    %Make consistant with (cosSi)^2 + (sinSi)^2 = 1
-    cosSi  =  state.cosSi;
-    sinSi = 1 - cosSi^2;
-    cosSi = 1 - sinSi^2;
-    %Compute transformation from local navigation to body
-    Rnw = [ cosSi, -sinSi, 0.0; sinSi, cosSi, 0.0; 0.0, 0.0, 1.0];
-    Tnb = Rnw*state.T;
-    Tnb = reOrthoNorm(Tnb);
-    state.T = Tnb;
-    %Tranform resolving frame from wander to local navigation
-    state.r = Rnw*state.r;
-    state.v = Rnw*state.v;
-    state.t = getEulerZYX(state.T);  %get new attitude
+% Old Implementation : Commented out 3/16/2017
+% %Once wander azimuth solution <2deg...
+%     %Make consistant with (cosSi)^2 + (sinSi)^2 = 1
+%     cosSi  =  state.cosSi;
+%     sinSi = 1 - cosSi^2;
+%     cosSi = 1 - sinSi^2;
+%     %Compute transformation from local navigation to body
+%     Rnw = [ cosSi, -sinSi, 0.0; sinSi, cosSi, 0.0; 0.0, 0.0, 1.0];
+%     Tnb = Rnw*state.T;
+%     Tnb = reOrthoNorm(Tnb);
+%     state.T = Tnb;
+%     %Tranform resolving frame from wander to local navigation
+%     state.r = Rnw*state.r;
+%     state.v = Rnw*state.v;
+%     state.t = getEulerZYX(state.T);  %get new attitude
 
+%Start QuasiStationary Zero Velocity Update
 
-
-for i = 1:length(specificForce);
+for i = burnIn:(lenTime-burnOut);
     
-    if i == 1 %Initialize
+    if i == burnIn %Initialize
                 
         %Number of states
         state.n = 15;
-        state.T = R_ZYX(state.t(1),state.t(2),state.t(3)); %Initial orientation coordinate transformation %check this
-        state.r0 = state.r;
+        
+        % Initialize quasi-stationary zero velocity update
+        state.r = [L;lambda;h]; % reinitialize position
+        state.r0 = [L;lambda;h];
+        state.v = [0;0;0];  % reinitialize velocity
+        state.t = rot2euler_zyx(state.T);  % Retrieve Euler Angle Sequence 
+
         %Initialize errors
         state.dx = zeros(state.n,1);
         
-        %Initialize paramaters
-        params.Q = getQ_QuasiStationaryZVU();
-        params.R = getR_QuasiStationaryZVU();
+        %For now, keep covariance
+        state.P(10:11,:) = [];
+        state.P(:,10:11) = [];
+        %state.P = getP0_QuasiStationaryZVU();
 
-    else
-        imu.f = specificForce(i);
-        imu.omega = angularRate(i);
-        imu.dt = dt(i);
-        state = quasiStationaryAlignZVU(state,params,imu);            
+        %Initialize Parameters
+        params = gravityModel_WGS84(L,h); %gravity model
+        params.Q = getQ_MotorolaMotoZPlay();
+        params.R = getR_QuasiStationaryZVU();
+        params.G = getG_QuasiStationaryZVU();
+        
+        %For debugging
+        params.loopCount = 0;
     end
+    
+        tk = systemTime(i);
+        ak = find_closest_index(accelData(:,1),tk);
+        gk = find_closest_index(gyroData(:,1),tk);    
+        imu.f = accelData(ak,2:4)';
+        imu.omega = gyroData(gk,2:4)';
+        imu.dt = 0.005 ; %dt(i);
+        state = quasiStationaryAlignZVU(state,params,imu);       
+        
+        %Update Gravity with new position estimate
+        params = gravityModel_WGS84(state.r(1),state.r(3),params); %gravity model
+        
+        params.loopCount = params.loopCount+1; 
         
 end
-        
- 
-    

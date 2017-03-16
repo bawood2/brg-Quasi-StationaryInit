@@ -1,4 +1,4 @@
-function PHI = getPHI_QuasiStationaryZVU(state,F)
+function PHI = getPHI_QuasiStationaryZVU(state,imu,F)
 %getPHI_QuasiStationaryZVU : get state transition matrix for the
 %Quasi-stationary zero velocity update implementation
 %Inputs

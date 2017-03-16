@@ -1,7 +1,7 @@
 function state = imuStatePropogationLocalFrame(state,params,imu)
 
 %Initial values
-dt = state.dt; %Timestep
+dt = imu.dt; %Timestep
 
 
 hkm1 = state.r(3);
@@ -41,7 +41,7 @@ vDp = state.v(3);
 
 
 hk = hkm1 - dt/2.0 * ( vDm + vDp);
-Lk = Lkm1 + dt/2.0 * ( vNm / ( RNm+hkm1) + vNp / (Rnm + hk) );
+Lk = Lkm1 + dt/2.0 * ( vNm / ( RNm+hkm1) + vNp / (RNm + hk) );
 sinLp = sin(Lk);
 cosLp = cos(Lk);
 REp = get_RE(sinLp,params);

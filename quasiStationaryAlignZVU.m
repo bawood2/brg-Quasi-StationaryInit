@@ -1,17 +1,22 @@
 function state = quasiStationaryAlignZVU(state,params,imu)
 
 %Propogate state with IMU measurements
-state = imuStatePropogationZVU(state,params,imu);
+state = imuStatePropogationLocalFrame(state,params,imu);
 
 %Error and uncertainty propogation
 F = getF_QuasiStationaryZVU(state,params,imu); % Get State Jacobian
-PHI = getPHI_QuasiStationaryZVU(state,F); % Get state transition matrix
+PHI = getPHI_QuasiStationaryZVU(state,imu,F); % Get state transition matrix
+Q = getQ_QuasiStationaryZVU(state,imu,params,PHI);
 %state.dx = PHI*state.dx; % Since states are zeroed, no need to propogate
-Pk = PHI*state.P*PHI' + params.Q*params.dt; % Propogate uncertainty
+Pk = PHI*state.P*PHI' + Q; % Propogate uncertainty
+
+if params.loopCount>5000
+    keyboard;
+end
 
 %Compute Kalman Gain
 [dz,H] = getzH_QuasiStationaryZVU(state); % measurement and mapping
-Gamma = H*P*H' + params.R; % Innovations
+Gamma = H*Pk*H' + params.R; % Innovations
 K = Pk*H'/Gamma;
 
 
@@ -24,11 +29,13 @@ state.dx = state.dx + K*dz;
 state.r = state.r - state.dx(1:3);
 state.v = state.v - state.dx(4:6);
 state.t = state.t - state.dx(7:9);
-state.T =  (eye(3) - skewmat(state.t))*state.T; % small angle approx
-state.b_a = state.b_a - state.dx(12:14);
-state.b_g = state.b_g - state.dx(15:17);
+%state.T =  (eye(3) - skewmat(state.t))*state.T; % small angle approx
+state.T = R_ZYX(state.dx(7),state.dx(8),state.dx(9))'*state.T;
+state.T = reOrthoNorm(state.T);
+state.b_a = state.dx(10:12);
+state.b_g = state.dx(13:15);
 
 %Zero Kalman Filter Estimate of position, velocity, attitude ( see pg 366)
-state.dx(1:9) = zeros(9,1);
+state.dx(1:end) = zeros(state.n,1);
 
 end
