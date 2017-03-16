@@ -9,7 +9,7 @@ function F = getF_QuasiStationaryUnknown(state,params,imu)
 %   F : system transition matrix.  Jocobian  d xdot / d x
 %
 %Reference
-%   Equations from Chapter 13 : INS Alignment pg 414
+%   Equations from Groves Chapter 13 pg 414
 %
 %Log 
 % 3/5/17 Brandon Wood : Initial Implementation

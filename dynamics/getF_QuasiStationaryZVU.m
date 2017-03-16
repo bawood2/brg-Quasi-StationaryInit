@@ -1,5 +1,18 @@
 function F = getF_QuasiStationaryZVU(state,params,imu)
-
+%getF_QuasiStationaryZVU : get system transition matrix for the
+%Quasi-stationary zero velocity update implementation
+%Inputs
+%   state : data structure containing elements of the state
+%   params : data structure containing additional parameters
+%   imu: data structure containing imu data
+%Outputs
+%   F : system transition matrix.  Jocobian  d xdot / d x
+%
+%Reference
+%   Equations from Groves Chapter 12 : pg 384 - 387
+%
+%Log 
+% 3/5/17 Brandon Wood : Initial Implementation
 O = zeros(3,3);
 
 T = state.T; % Coordinate transformation matrix
@@ -78,8 +91,8 @@ F23 = [ f11,0.0,f13;...
 dvdot_dx = [F21 F22 F23 T O];
 
 %% Compute attitude Jacobian
-omegaIE = [wie*cosL; 0.0 ; -wie*sinL]; %Chapter 2 pg 44
-omegaEN = [ vE/reh ; -vN/rnh ; -vE*tanL/reh]; %Chapter 5 pg 131
+omegaIE = [wie*cosL; 0.0 ; -wie*sinL]; % Groves Chapter 2 pg 44
+omegaEN = [ vE/reh ; -vN/rnh ; -vE*tanL/reh]; %  Groves Chapter 5 pg 131
 omegaIN = omegaIE + omegaEN;
 F31 = -skewmat(omegaIN);
 
@@ -113,18 +126,21 @@ F = [ drdot_dx ; dvdot_dx ; dsidot_dx ; dba_dx ; dbg_dx ];
 end
 
 function reS = get_reS(sinL,cosL,RE,params)
-%Chapter 2 pg 48
+% get_reS : Computes the geocentrid radius at the Earth surface
+% Reference : Groves Chapter 2 pg 48
 reS = RE*sqrt(cosL^2 +(1 - params.e^2)^2 *sinL^2);
 end
 
 function RN = get_RN(sinL,params)
-%Chapter 2 pg 41
+% get_RN : Computes the Earth meridian radius of curvature
+% Reference : Groves Chapter 2 pg 41
 RN = params.R0 * ( 1.0 - params.e^2) / (( 1.0 - params.e^2 * sinL^2)^(3.0/2.0));
 
 end
 
-function RE = get_RE(sinL,params)
-%Chapter 2 pg 41
+function RE = get_RE(sinL,params
+% get_RE : Computes the Earth transverse radius of curvature
+% Reference : Groves Chapter 2 pg 41
 RE = params.R0 / (( 1.0 - params.e^2 * sinL^2)^(1.0/2.0));
 
 end

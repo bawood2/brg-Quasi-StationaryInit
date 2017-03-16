@@ -6,10 +6,11 @@ function PHI = getPHI_QuasiStationaryUnknown(state,imu,F)
 %   imu: data structure containing imu data
 %   F :system transition matrix.  Jocobian  d xdot / d x
 %Outputs
-%   PHI : state transition matrix.
+%   PHI : state transition matrix.  Transistions the state from tkm1 to tk
+%   in discrete time over the fixed time interval dt = (tkm1-tk).
 %
 %Reference
-%   Equation from Chapter 3 : Kalman Filter pg 68
+%   Equation from Groves Chapter 3 : Kalman Filter pg 68
 %
 %Log 
 % 3/5/17 Brandon Wood : Initial Implementation
