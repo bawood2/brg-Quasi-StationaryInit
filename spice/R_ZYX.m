@@ -1,12 +1,19 @@
 function R = R_ZYX(t1,t2,t3)
-%R_ZYZ
+%R_ZYX : Computes a coordinate tranformation matrix from a ZYX Euler angle
+%sequence (yaw,pitch,roll)
+%
 %Inputs
 %   t1 : yaw
 %   t2 : pitch
 %   t3 : roll
 %
 %Ouputs
-%   R : ZYX (yaw,pitch,roll) Euler Sequence coordinate transformation
+%   R : ZYX (yaw,pitch,roll) Euler Sequence coordinate transformation 
+%
+%Log 
+% 3/5/17 Brandon Wood : Initial Implementation
+
+%To save computation time
 cosSi = cos(t1);
 sinSi = sin(t1);
 cosTheta = cos(t2);
@@ -20,6 +27,6 @@ Rz = [ cosSi -sinSi 0 ; sinSi cosSi 0 ; 0 0 1];
 Ry = [ cosTheta 0 sinTheta ; 0 1 0 ; -sinTheta 0 cosTheta];
 Rx = [ 1 0 0 ; 0 cosPhi -sinPhi ; 0 sinPhi cosPhi];
 
-R = Rz*Ry*Rx;   % - compute orientation from Euler Angles (state.theta1, state.theta2, state.theta3)
+R = Rz*Ry*Rx;  
 
 end

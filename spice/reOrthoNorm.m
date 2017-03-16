@@ -1,5 +1,7 @@
 function R = reOrthoNorm(R)
-%reOrthoNorm :
+%reOrthoNorm : Comptutes an orthonormal coordinate transformation matrix
+%from a coordinate transformation matrix that may not be strictly
+%orthonormal.
 %
 %Inputs
 %   R : Coordinate Tranformation Matrix
@@ -7,8 +9,11 @@ function R = reOrthoNorm(R)
 %Outputs
 %   R : Coordinate Tranformation Matrix
 %
-%Notes
-%   Method described in Chapter 5 : Inertial Navigation pg 141-142
+%Reference
+%   Method described in Groves Chapter 5 : Inertial Navigation pg 141-142
+%
+%Log
+% 3/5/17 Brandon Wood : Initial Implementation
 
 
 c1m = R(:,1);
