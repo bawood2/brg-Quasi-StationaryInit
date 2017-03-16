@@ -1,4 +1,20 @@
 function systemTime = getSystemTime(accelData,gyroData)
+%getSystemTime : Linear interpolate system time according to measurement
+%data
+%
+%Inputs
+%   accelData : accelerometer time stamped data
+%   gyroData : gyroscopic time stamped data
+%
+%Outputs
+%   systemTime : array of times that measurements will be selected from
+%
+%Notes
+%   All time stamped data are assumed to be in UNIX  millisecond 
+%
+%Log 
+% 3/8/17 Brandon Wood : Initial Implementation
+
 
 %Get initial and final times
 t0_a = accelData(1,1);

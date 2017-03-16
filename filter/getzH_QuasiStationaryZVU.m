@@ -9,7 +9,7 @@ function [dz,H] = getzH_QuasiStationaryZVU(state)
 %   H : measurement mapping matrix
 %
 %Reference
-%   Equations from Chapter 13 : Inertial Navigation pg 416
+%   Equations from Groves Chapter 13 pg 416
 %
 %Log 
 % 3/5/17 Brandon Wood : Initial Implementation

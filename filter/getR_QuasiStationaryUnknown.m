@@ -1,6 +1,19 @@
 function [R] = getR_QuasiStationaryUnknown()
-%Measurement noise covaraicne represents the variance of posisiont
-%displacement due to vibration and disturbance
+%getR_QuasiStationaryUnknown : Compute measurement noise covariance for
+%quasistationary unknown heading implementation
+%
+%Outputs
+%   R : measurement noise covariance
+%
+%Notes
+%   Measurement noise covariance represents the variance of position
+%   displacement due to vibration and disturbance
+%
+%Reference
+%   Equations from Groves Chapter 13 : pg 415 
+%
+%Log 
+% 3/5/17 Brandon Wood : Initial Implementation
 
 
 r11 = (10^-6)^2;
