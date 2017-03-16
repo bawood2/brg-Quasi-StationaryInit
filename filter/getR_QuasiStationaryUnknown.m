@@ -3,9 +3,9 @@ function [R] = getR_QuasiStationaryUnknown()
 %displacement due to vibration and disturbance
 
 
-r11 = (10^-4)^2;
-r22 = (10^-4)^2;
-r33 = (10^-4)^2;
+r11 = (10^-6)^2;
+r22 = (10^-6)^2;
+r33 = (10^-6)^2;
 R = [r11, 0.0, 0.0;...
     0.0, r22, 0.0;...
     0.0, 0.0, r33];

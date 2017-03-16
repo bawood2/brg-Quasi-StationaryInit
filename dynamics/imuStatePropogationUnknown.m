@@ -4,7 +4,7 @@ function state = imuStatePropogationUnknown(state,params,imu)
 dt = imu.dt; %Timestep
 
 vkm1 = state.v; % velocity
-Tkm1 = state.T; % Coordiante Fram Tranformation
+Tkm1 = state.T; % Coordiante Frame Transformation
 
 %Correct IMU measurements with bias estimates
 omegaIB = imu.omega - state.b_g;

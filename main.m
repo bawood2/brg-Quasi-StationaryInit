@@ -14,14 +14,10 @@ magData = xlsread(magFID);
 systemTime = getSystemTime(accelData,gyroData);
 lenTime = length(systemTime);
 
-%Lat Long coordinates are for UIUC
-L = -88.2272*DEG_TO_RAD; % longitude  88.2272° W  
-lambda = 40.1020*DEG_TO_RAD; %latitude  40.1020° N
+%Lat Long coordinates are for Coordinated Science Lab (Google Earth)
+L = -88.22675*DEG_TO_RAD; % longitude   88°13'36.30"W 
+lambda = 40.114742*DEG_TO_RAD; %latitude   40° 6'53.07"N
 h = 222; %altitude  %	222 m elevation of UIUC 
-
-%lat / long champaign
-%40.116421  
-%-88.243385
 
 %In system, IMU measurements are being taken.  Prior to alignment, need to
 %initialize orientation.  This is done by a leveling process. Prior to
@@ -67,11 +63,15 @@ for i = burnIn:(lenTime-burnOut);
         si = gyrocompassingProcess(wbar,theta,phi); % initial wander azimuth
         %Tnb = R_ZYX(0,theta,phi); %Initial orientation coordinate transformation %check this
         
-        
+        %si = 0;
         state.t = [si;theta;phi];
         
         state.sinSi = sin(si);
         state.cosSi = cos(si);
+        
+        %state.sinSi = 0;
+        %state.cosSi = 0;
+        
         %Twn = [state.cosSi, state.sinSi, 0.0; -state.sinSi, state.cosSi, 0.0; 0.0,0.0,1.0];
         Twb = R_ZYX(si,theta,phi); %Initial orientation coordinate transformation %check this
         %state.T = Twn*Tnb;
@@ -90,8 +90,9 @@ for i = burnIn:(lenTime-burnOut);
         params = gravityModel_WGS84(L,h); %gravity model
         params.cosL = cos(L);
         params.sinL = sin(L);
-        params.Q = getQ_QuasiStationaryUnknown(state);
+        params.Q = getQ_MotorolaMotoZPlayUnknown(state);
         params.R = getR_QuasiStationaryUnknown();
+        params.G = getG_QuasiStationaryUnknown(state);
         
         %For debugging
         params.loopCount = 0;
@@ -104,7 +105,7 @@ for i = burnIn:(lenTime-burnOut);
         gk = find_closest_index(gyroData(:,1),tk);    
         imu.f = accelData(ak,2:4)';
         imu.omega = gyroData(gk,2:4)';
-        imu.dt = dt ; %dt(i);
+        imu.dt = 0.005 ; %dt(i);
         state = quasiStationaryAlignUnknownHeading(state,params,imu);  
         
         params.loopCount = params.loopCount+1;
